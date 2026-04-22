@@ -1,100 +1,15 @@
--- YABUJIN - Unlock All Weapons + Skin Changer + Crosshair
--- Works on Madium Executor
+-- YABUJIN - PlayerGui Version (Not CoreGui)
 local player = game.Players.LocalPlayer
 local gui = Instance.new("ScreenGui")
-gui.Name = "YabujinUnlocker"
-gui.Parent = game:GetService("CoreGui")
+gui.Name = "Yabujin"
+gui.Parent = player:WaitForChild("PlayerGui")  -- Different from CoreGui
 
--- ========== WEAPON UNLOCKER (Client-Side Visual) ==========
--- This makes ALL weapons appear UNLOCKED in your inventory
-local function unlockAllWeapons()
-    pcall(function()
-        -- Find the weapons menu and unlock everything visually
-        local playerGui = player:WaitForChild("PlayerGui")
-        local weaponsMenu = playerGui:FindFirstChild("WeaponsMenu") or playerGui:FindFirstChild("Loadout")
-        
-        if weaponsMenu then
-            for _, item in pairs(weaponsMenu:GetDescendants()) do
-                if item:IsA("ImageButton") or item:IsA("TextButton") then
-                    item.Visible = true
-                    -- Remove lock icons
-                    local lock = item:FindFirstChild("LockIcon") or item:FindFirstChild("Lock")
-                    if lock then lock.Visible = false end
-                end
-            end
-        end
-        
-        -- Also unlock in shop
-        local shop = playerGui:FindFirstChild("Shop")
-        if shop then
-            for _, item in pairs(shop:GetDescendants()) do
-                if item:IsA("ImageButton") then
-                    item.Visible = true
-                    local lock = item:FindFirstChild("LockIcon") or item:FindFirstChild("Lock")
-                    if lock then lock.Visible = false end
-                end
-            end
-        end
-    end)
-    print("[Yabujin] All weapons unlocked visually!")
-end
-
--- ========== SKIN CHANGER FUNCTIONS ==========
-local function applyCharacterSkin(color)
-    local char = player.Character or player.CharacterAdded:Wait()
-    if char then
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.Color = color
-                part.Material = Enum.Material.Neon
-            end
-        end
-    end
-end
-
-local function applyWeaponSkin(color)
-    local char = player.Character
-    if char then
-        local tool = char:FindFirstChildOfClass("Tool")
-        if tool then
-            for _, part in ipairs(tool:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Color = color
-                    part.Material = Enum.Material.Neon
-                end
-            end
-        end
-    end
-end
-
-local function resetSkins()
-    local char = player.Character
-    if char then
-        for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.Color = Color3.fromRGB(255, 255, 255)
-                part.Material = Enum.Material.Plastic
-            end
-        end
-        local tool = char:FindFirstChildOfClass("Tool")
-        if tool then
-            for _, part in ipairs(tool:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Color = Color3.fromRGB(255, 255, 255)
-                    part.Material = Enum.Material.Plastic
-                end
-            end
-        end
-    end
-end
-
--- ========== CROSSHAIR ==========
+-- Crosshair
 local crosshair = Instance.new("Frame")
 crosshair.Size = UDim2.new(0, 20, 0, 20)
 crosshair.Position = UDim2.new(0.5, -10, 0.48, -10)
 crosshair.BackgroundTransparency = 1
 crosshair.Parent = gui
-crosshair.ZIndex = 999
 
 local lineH = Instance.new("Frame")
 lineH.Size = UDim2.new(0, 14, 0, 2)
@@ -108,10 +23,25 @@ lineV.Position = UDim2.new(0.5, -1, 0.5, -7)
 lineV.BackgroundColor3 = Color3.fromRGB(255, 80, 200)
 lineV.Parent = crosshair
 
--- ========== MAIN GUI WINDOW ==========
+-- Unlock function
+local function unlockWeapons()
+    pcall(function()
+        local pg = player:WaitForChild("PlayerGui")
+        for _, v in pairs(pg:GetDescendants()) do
+            if v:IsA("ImageButton") or v:IsA("TextButton") then
+                v.Visible = true
+                local lock = v:FindFirstChild("LockIcon") or v:FindFirstChild("Lock")
+                if lock then lock.Visible = false end
+            end
+        end
+    end)
+    print("Weapons unlocked!")
+end
+
+-- Main Window
 local window = Instance.new("Frame")
-window.Size = UDim2.new(0, 320, 0, 400)
-window.Position = UDim2.new(0.5, -160, 0.5, -200)
+window.Size = UDim2.new(0, 300, 0, 350)
+window.Position = UDim2.new(0.5, -150, 0.5, -175)
 window.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 window.BackgroundTransparency = 0
 window.BorderSizePixel = 0
@@ -121,7 +51,6 @@ local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = window
 
--- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.BackgroundColor3 = Color3.fromRGB(255, 80, 200)
@@ -139,7 +68,6 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
--- Close Button
 local close = Instance.new("TextButton")
 close.Size = UDim2.new(0, 30, 0, 30)
 close.Position = UDim2.new(1, -35, 0, 3)
@@ -151,12 +79,11 @@ close.Font = Enum.Font.GothamBold
 close.Parent = titleBar
 close.MouseButton1Click:Connect(function() gui:Destroy() end)
 
--- Scroll Frame for buttons
 local scroll = Instance.new("ScrollingFrame")
 scroll.Size = UDim2.new(1, -10, 1, -45)
 scroll.Position = UDim2.new(0, 5, 0, 40)
 scroll.BackgroundTransparency = 1
-scroll.CanvasSize = UDim2.new(0, 0, 0, 500)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 400)
 scroll.ScrollBarThickness = 4
 scroll.Parent = window
 
@@ -164,150 +91,170 @@ local layout = Instance.new("UIListLayout")
 layout.Padding = UDim.new(0, 5)
 layout.Parent = scroll
 
--- Helper functions
-local function addButton(text, color, callback)
+local function addBtn(text, color, cb)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 38)
+    btn.Size = UDim2.new(1, -10, 0, 35)
     btn.BackgroundColor3 = color
     btn.BackgroundTransparency = 0.3
     btn.Text = text
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 12
+    btn.TextSize = 11
     btn.Font = Enum.Font.GothamSemibold
     btn.Parent = scroll
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 6)
-    btnCorner.Parent = btn
-    
-    btn.MouseButton1Click:Connect(callback)
-    return btn
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 5)
+    c.Parent = btn
+    btn.MouseButton1Click:Connect(cb)
 end
 
-local function addLabel(text)
+local function addLbl(text)
     local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, -10, 0, 25)
+    lbl.Size = UDim2.new(1, -10, 0, 22)
     lbl.BackgroundTransparency = 1
     lbl.Text = text
     lbl.TextColor3 = Color3.fromRGB(255, 100, 200)
-    lbl.TextSize = 12
+    lbl.TextSize = 11
     lbl.Font = Enum.Font.GothamBold
     lbl.Parent = scroll
-    return lbl
 end
 
--- ========== UNLOCK BUTTONS ==========
-addLabel("🔓 UNLOCK WEAPONS (Click Me First!)")
+addLbl("🔓 UNLOCK")
+addBtn("UNLOCK ALL WEAPONS", Color3.fromRGB(255, 80, 200), function()
+    unlockWeapons()
+    local n = Instance.new("TextLabel")
+    n.Size = UDim2.new(0, 200, 0, 25)
+    n.Position = UDim2.new(0.5, -100, 0, 50)
+    n.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    n.Text = "✓ WEAPONS UNLOCKED!"
+    n.TextColor3 = Color3.fromRGB(100, 255, 100)
+    n.TextSize = 11
+    n.Font = Enum.Font.Gotham
+    n.Parent = gui
+    wait(1.5)
+    n:Destroy()
+end)
 
-addButton("⭐ UNLOCK ALL WEAPONS", Color3.fromRGB(255, 80, 200), function()
-    unlockAllWeapons()
-    -- Also try to unlock via game remotes
-    pcall(function()
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("UnlockWeapon")
-        if remote then
-            local weapons = {"AK47", "AUG", "TommyGun", "BoneclawRifle", "GloriousRifle", "PhoenixRifle"}
-            for _, weapon in ipairs(weapons) do
-                remote:FireServer(weapon)
+addLbl("━━ CHARACTER ━━")
+addBtn("Pink Skin", Color3.fromRGB(255, 80, 200), function()
+    local char = player.Character
+    if char then
+        for _, p in pairs(char:GetDescendants()) do
+            if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+                p.Color = Color3.fromRGB(255, 80, 200)
+                p.Material = Enum.Material.Neon
             end
         end
-    end)
-    -- Notification
-    local notif = Instance.new("TextLabel")
-    notif.Size = UDim2.new(0, 250, 0, 30)
-    notif.Position = UDim2.new(0.5, -125, 0, 50)
-    notif.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    notif.Text = "✓ ALL WEAPONS UNLOCKED!"
-    notif.TextColor3 = Color3.fromRGB(100, 255, 100)
-    notif.TextSize = 12
-    notif.Font = Enum.Font.Gotham
-    notif.Parent = gui
-    game:GetService("TweenService"):Create(notif, TweenInfo.new(2), {Position = UDim2.new(0.5, -125, 0, 10)}):Play()
-    wait(2)
-    notif:Destroy()
+    end
+end)
+addBtn("Cyan Skin", Color3.fromRGB(0, 255, 255), function()
+    local char = player.Character
+    if char then
+        for _, p in pairs(char:GetDescendants()) do
+            if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+                p.Color = Color3.fromRGB(0, 255, 255)
+                p.Material = Enum.Material.Neon
+            end
+        end
+    end
+end)
+addBtn("Gold Skin", Color3.fromRGB(255, 200, 0), function()
+    local char = player.Character
+    if char then
+        for _, p in pairs(char:GetDescendants()) do
+            if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+                p.Color = Color3.fromRGB(255, 200, 0)
+                p.Material = Enum.Material.Metal
+            end
+        end
+    end
 end)
 
-addLabel("━━━ CHARACTER SKINS ━━━")
-addButton("💗 Pink Neon", Color3.fromRGB(255, 80, 200), function()
-    applyCharacterSkin(Color3.fromRGB(255, 80, 200))
+addLbl("━━ WEAPON ━━")
+addBtn("Pink Weapon", Color3.fromRGB(255, 80, 200), function()
+    local char = player.Character
+    if char then
+        local tool = char:FindFirstChildOfClass("Tool")
+        if tool then
+            for _, p in pairs(tool:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    p.Color = Color3.fromRGB(255, 80, 200)
+                    p.Material = Enum.Material.Neon
+                end
+            end
+        end
+    end
 end)
-addButton("💙 Cyan Neon", Color3.fromRGB(0, 255, 255), function()
-    applyCharacterSkin(Color3.fromRGB(0, 255, 255))
-end)
-addButton("💛 Gold Metal", Color3.fromRGB(255, 200, 0), function()
-    applyCharacterSkin(Color3.fromRGB(255, 200, 0))
-end)
-addButton("💜 Purple Glass", Color3.fromRGB(150, 50, 200), function()
-    applyCharacterSkin(Color3.fromRGB(150, 50, 200))
+addBtn("Cyan Weapon", Color3.fromRGB(0, 255, 255), function()
+    local char = player.Character
+    if char then
+        local tool = char:FindFirstChildOfClass("Tool")
+        if tool then
+            for _, p in pairs(tool:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    p.Color = Color3.fromRGB(0, 255, 255)
+                    p.Material = Enum.Material.Neon
+                end
+            end
+        end
+    end
 end)
 
-addLabel("━━━ WEAPON SKINS ━━━")
-addButton("🔫 Pink Weapon", Color3.fromRGB(255, 80, 200), function()
-    applyWeaponSkin(Color3.fromRGB(255, 80, 200))
-end)
-addButton("🔫 Cyan Weapon", Color3.fromRGB(0, 255, 255), function()
-    applyWeaponSkin(Color3.fromRGB(0, 255, 255))
-end)
-addButton("🔫 Gold Weapon", Color3.fromRGB(255, 200, 0), function()
-    applyWeaponSkin(Color3.fromRGB(255, 200, 0))
-end)
-addButton("🔫 Rainbow Weapon", Color3.fromRGB(255, 100, 255), function()
-    applyWeaponSkin(Color3.fromRGB(255, 100, 255))
-end)
-
-addLabel("━━━ CROSSHAIR ━━━")
-addButton("🎯 Hide Crosshair", Color3.fromRGB(100, 100, 120), function()
-    crosshair.Visible = false
-end)
-addButton("🎯 Show Crosshair", Color3.fromRGB(100, 200, 100), function()
-    crosshair.Visible = true
-end)
-addButton("🎨 Pink Crosshair", Color3.fromRGB(255, 80, 200), function()
+addLbl("━━ CROSSHAIR ━━")
+addBtn("Hide Crosshair", Color3.fromRGB(100, 100, 120), function() crosshair.Visible = false end)
+addBtn("Show Crosshair", Color3.fromRGB(100, 200, 100), function() crosshair.Visible = true end)
+addBtn("Pink", Color3.fromRGB(255, 80, 200), function()
     lineH.BackgroundColor3 = Color3.fromRGB(255, 80, 200)
     lineV.BackgroundColor3 = Color3.fromRGB(255, 80, 200)
 end)
-addButton("🎨 Cyan Crosshair", Color3.fromRGB(0, 255, 255), function()
+addBtn("Cyan", Color3.fromRGB(0, 255, 255), function()
     lineH.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
     lineV.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
 end)
-addButton("🎨 White Crosshair", Color3.fromRGB(255, 255, 255), function()
-    lineH.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    lineV.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-end)
 
-addLabel("━━━ RESET ━━━")
-addButton("🔄 Reset All Skins", Color3.fromRGB(150, 150, 50), function()
-    resetSkins()
+addLbl("━━ RESET ━━")
+addBtn("Reset Skins", Color3.fromRGB(150, 150, 50), function()
+    local char = player.Character
+    if char then
+        for _, p in pairs(char:GetDescendants()) do
+            if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+                p.Color = Color3.fromRGB(255, 255, 255)
+                p.Material = Enum.Material.Plastic
+            end
+        end
+        local tool = char:FindFirstChildOfClass("Tool")
+        if tool then
+            for _, p in pairs(tool:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    p.Color = Color3.fromRGB(255, 255, 255)
+                    p.Material = Enum.Material.Plastic
+                end
+            end
+        end
+    end
 end)
-addButton("❌ Destroy GUI", Color3.fromRGB(200, 50, 50), function()
-    gui:Destroy()
-end)
+addBtn("Destroy GUI", Color3.fromRGB(200, 50, 50), function() gui:Destroy() end)
 
--- Auto-unlock weapons when GUI loads
-unlockAllWeapons()
+-- Auto-unlock
+unlockWeapons()
 
--- Make window draggable
-local dragging = false
+-- Draggable
+local drag = false
 local dragStart, startPos
-
 titleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
+        drag = true
         dragStart = input.Position
         startPos = window.Position
     end
 end)
-
 titleBar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end
 end)
-
 game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    if drag and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - dragStart
         window.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
-print("✅ YABUJIN UNLOCKER LOADED - All weapons should now appear unlocked!")
+print("✅ YABUJIN LOADED - PlayerGui Version")
